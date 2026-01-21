@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Instalaz - Setup</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .wizard-container {
+            background: #2a2a2a;
+            border-radius: 6px;
+            border: 1px solid #404040;
+            max-width: 680px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .wizard-header {
+            background: #333;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 1px solid #404040;
+        }
+
+        .wizard-header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .wizard-header p {
+            opacity: 0.8;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .wizard-body {
+            padding: 40px;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: #404040;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #666;
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step h2 {
+            color: #ffffff;
+            margin-bottom: 16px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step p {
+            color: #b0b0b0;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .instruction-box {
+            background: #333;
+            border: 1px solid #404040;
+            border-left: 2px solid #666;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .instruction-box h3 {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .instruction-box ol {
+            margin-left: 20px;
+            color: #b0b0b0;
+        }
+
+        .instruction-box li {
+            margin: 10px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .instruction-box a {
+            color: #999;
+            text-decoration: underline;
+        }
+
+        .instruction-box a:hover {
+            color: #ccc;
+        }
+
+        .button {
+            background: #333;
+            color: white;
+            border: 1px solid #404040;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .button:hover {
+            background: #404040;
+            border-color: #555;
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .button-secondary {
+            background: #2a2a2a;
+            color: #999;
+        }
+
+        .button-secondary:hover {
+            background: #333;
+            color: #ccc;
+        }
+
+        .wizard-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #404040;
+            gap: 12px;
+        }
+
+        .alert {
+            padding: 14px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            border: 1px solid #404040;
+        }
+
+        .alert-info {
+            background: #2a3540;
+            border-color: #3d4f5e;
+            color: #a8c5db;
+        }
+
+        .alert-success {
+            background: #2a3d2a;
+            border-color: #3d5e3d;
+            color: #a8dba8;
+        }
+
+        .alert-warning {
+            background: #3d3a2a;
+            border-color: #5e553d;
+            color: #dbd4a8;
+        }
+
+        .alert strong {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 24px 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 32px;
+            position: relative;
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .feature-list li ion-icon {
+            position: absolute;
+            left: 0;
+            color: #666;
+            font-size: 20px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            background: #333;
+            color: #e0e0e0;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #555;
+            background: #3a3a3a;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #666;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #b0b0b0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .video-embed {
+            margin: 20px 0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #404040;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1>
+                <ion-icon name="flash-outline"></ion-icon>
+                Welcome to Instalaz
+            </h1>
+            <p>5-minute setup for Instagram automation</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="wizard-body">
+            <!-- Step 1: Welcome -->
+            <div class="step active" data-step="1">
+                <h2>
+                    <ion-icon name="rocket-outline"></ion-icon>
+                    Let's Get Started
+                </h2>
+                <p>Instalaz automates Instagram posting. Follow these simple steps to set it up.</p>
+
+                <ul class="feature-list">
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Auto-post carousels and reels</li>
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Schedule posts at optimal times</li>
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Manage multiple accounts</li>
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Track posting history</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <strong>What you'll need:</strong><br>
+                    • Instagram Business Account<br>
+                    • Facebook account<br>
+                    • 5 minutes for setup
+                </div>
+            </div>
+
+            <!-- Step 2: Create Facebook App (Simplified) -->
+            <div class="step" data-step="2">
+                <h2>
+                    <ion-icon name="construct-outline"></ion-icon>
+                    Step 1: Create Facebook App
+                </h2>
+                <p>This connects Instalaz to your Instagram account.</p>
+
+                <div class="instruction-box">
+                    <h3>Quick Steps (2 minutes):</h3>
+                    <ol>
+                        <li>Open <a href="https://developers.facebook.com/apps/create/" target="_blank">Facebook
+                                Developers</a> in a new tab</li>
+                        <li>Click <strong>"Create App"</strong></li>
+                        <li>Select <strong>"Other"</strong> → <strong>"Business"</strong> → <strong>"Next"</strong></li>
+                        <li>App Name: Type <strong>"My Instalaz"</strong></li>
+                        <li>Click <strong>"Create App"</strong></li>
+                        <li>On the left menu, click <strong>"Add Product"</strong> → Find <strong>"Instagram"</strong> →
+                            Click <strong>"Set Up"</strong></li>
+                        <li>Go to <strong>Settings → Basic</strong> (left menu)</li>
+                        <li>Copy your <strong>App ID</strong> and <strong>App Secret</strong> (click "Show") below</li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Important:</strong> Keep your App Secret private. Don't share it!
+                </div>
+
+                <form action="/save-fb-credentials" method="POST" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label>Facebook App ID</label>
+                        <input type="text" name="app_id" required placeholder="123456789012345">
+                    </div>
+                    <div class="form-group">
+                        <label>Facebook App Secret</label>
+                        <input type="password" name="app_secret" required
+                            placeholder="Click 'Show' to copy from Facebook">
+                    </div>
+                    <button type="submit" class="button">
+                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                        Save & Continue
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 3: Instagram Business Account -->
+            <div class="step" data-step="3">
+                <h2>
+                    <ion-icon name="logo-instagram"></ion-icon>
+                    Step 2: Instagram Business Account
+                </h2>
+                <p>Your Instagram must be a Business Account to use the API.</p>
+
+                <div class="alert alert-success">
+                    <strong>Already have Business Account?</strong> Great! Skip to next step.
+                </div>
+
+                <div class="instruction-box">
+                    <h3>Convert to Business (1 minute):</h3>
+                    <ol>
+                        <li>Open Instagram app on your phone</li>
+                        <li>Go to <strong>Settings</strong></li>
+                        <li>Tap <strong>Account</strong> → <strong>"Switch to Professional Account"</strong></li>
+                        <li>Choose <strong>"Business"</strong></li>
+                        <li>Connect to a Facebook Page (create one if needed)</li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Need a Facebook Page?</strong><br>
+                    Create one at <a href="https://www.facebook.com/pages/create"
+                        target="_blank">facebook.com/pages/create</a> (takes 1 minute)
+                </div>
+            </div>
+
+            <!-- Step 4: Connect Account -->
+            <div class="step" data-step="4">
+                <h2>
+                    <ion-icon name="link-outline"></ion-icon>
+                    Step 3: Connect Instagram
+                </h2>
+                <p>Click below to connect your Instagram account.</p>
+
+                <div style="text-align: center; padding: 30px 20px;">
+                    <a href="/auth/login" class="button" style="font-size: 16px; padding: 14px 24px;">
+                        <ion-icon name="logo-facebook"></ion-icon>
+                        Connect with Facebook
+                    </a>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>What happens next:</strong><br>
+                    • Facebook will ask for permission<br>
+                    • Allow Instalaz to post on your behalf<br>
+                    • You'll be redirected back here<br>
+                    • Setup complete!
+                </div>
+            </div>
+
+            <!-- Step 5: Success -->
+            <div class="step" data-step="5">
+                <h2>
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    Setup Complete!
+                </h2>
+
+                <div class="alert alert-success">
+                    <strong>🎉 You're ready to go!</strong><br>
+                    Your Instagram account is connected and ready for automation.
+                </div>
+
+                <p style="color: #b0b0b0;">Here's what you can do now:</p>
+
+                <ul class="feature-list" style="margin: 32px 0;">
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Add your content (images/videos)</li>
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Set posting schedule</li>
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Preview before publishing</li>
+                    <li><ion-icon name="checkmark-circle-outline"></ion-icon>Track posting history</li>
+                </ul>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="/dashboard" class="button" style="font-size: 16px; padding: 14px 28px;">
+                        <ion-icon name="home-outline"></ion-icon>
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="wizard-footer">
+                <button class="button button-secondary" id="prevBtn" onclick="changeStep(-1)">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Previous
+                </button>
+                <button class="button" id="nextBtn" onclick="changeStep(1)">
+                    Next
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function getStepFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const step = parseInt(params.get('step')) || 1;
+            return Math.min(Math.max(step, 1), totalSteps);
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-block';
+            document.getElementById('nextBtn').style.display = step === totalSteps || step === 2 || step === 4 ? 'none' : 'inline-block';
+
+            updateProgress();
+        }
+
+        function changeStep(delta) {
+            const newStep = currentStep + delta;
+            if (newStep >= 1 && newStep <= totalSteps) {
+                currentStep = newStep;
+                showStep(currentStep);
+            }
+        }
+
+        currentStep = getStepFromURL();
+        showStep(currentStep);
+    </script>
+</body>
+
+</html>

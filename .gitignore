@@ -1,0 +1,13 @@
+# Environment variables
+.env
+
+# Python cache
+# Python cache
+__pycache__/
+*.pyc
+
+# App State (Auto-generated)
+*_status.json
+*_used.json
+*_caption.json
+*_image.json

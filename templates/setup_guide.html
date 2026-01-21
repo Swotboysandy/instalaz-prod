@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Instalaz</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ededed;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 60px;
+            padding: 0 24px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            padding: 40px 0;
+            border-right: 1px solid #262626;
+        }
+
+        .sidebar h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 8px 12px;
+            color: #a0a0a0;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .sidebar a:hover {
+            color: #fff;
+            background: #1a1a1a;
+        }
+
+        .sidebar a.active {
+            color: #fff;
+            background: #1a1a1a;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        /* Top Header */
+        .top-nav {
+            background: #0a0a0a;
+            border-bottom: 1px solid #262626;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .top-nav a {
+            color: #a0a0a0;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.15s;
+        }
+
+        .top-nav a:hover {
+            color: #fff;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 40px 0;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 40px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin: 48px 0 24px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #262626;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin: 32px 0 16px;
+            font-weight: 600;
+        }
+
+        p {
+            color: #a0a0a0;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .lead {
+            font-size: 18px;
+            color: #b0b0b0;
+            margin-bottom: 40px;
+        }
+
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        pre {
+            background: #1a1a1a;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 24px 0;
+            border: 1px solid #262626;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        ol,
+        ul {
+            margin: 16px 0 16px 24px;
+            color: #a0a0a0;
+        }
+
+        li {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 6px;
+            margin: 24px 0;
+            border-left: 3px solid;
+            background: #1a1a1a;
+        }
+
+        .alert-info {
+            border-color: #3b82f6;
+        }
+
+        .alert-warning {
+            border-color: #f59e0b;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn:hover {
+            background: #e0e0e0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-nav">
+        <div class="top-nav-content">
+            <a href="/" class="logo">Instalaz</a>
+            <div>
+                <a href="/dashboard">Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <nav class="sidebar">
+            <div class="nav-section">
+                <h3>Getting Started</h3>
+                <a href="#quick-start" class="active">Quick Start</a>
+                <a href="#setup">Setup</a>
+                <a href="#connect">Connect Instagram</a>
+            </div>
+
+            <div class="nav-section">
+                <h3>Features</h3>
+                <a href="#posting">Auto Posting</a>
+                <a href="#scheduling">Scheduling</a>
+                <a href="#accounts">Multiple Accounts</a>
+            </div>
+
+            <div class="nav-section">
+                <h3>Troubleshooting</h3>
+                <a href="#errors">Common Errors</a>
+                <a href="#tokens">Token Management</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1>Documentation</h1>
+            <p class="lead">Everything you need to automate your Instagram posting.</p>
+
+            <!-- Quick Start -->
+            <h2 id="quick-start">Quick Start</h2>
+            <p>Get Instalaz running in 2 minutes:</p>
+
+            <pre><code>pip install -r requirements.txt
+python app.py</code></pre>
+
+            <p>Visit <a href="/onboarding">http://localhost:5000/onboarding</a> to begin setup.</p>
+
+            <!-- Setup -->
+            <h2 id="setup">Setup</h2>
+
+            <h3>1. Create Facebook App</h3>
+            <ol>
+                <li>Go to <a href="https://developers.facebook.com/apps/create/" target="_blank">Facebook Developers</a>
+                </li>
+                <li>Click "Create App" → Select "Business"</li>
+                <li>Name your app (e.g., "My Instalaz")</li>
+                <li>Add "Instagram" product</li>
+            </ol>
+
+            <h3>2. Configure OAuth</h3>
+            <div class="alert alert-warning">
+                <strong>Important</strong>
+                This step prevents connection errors.
+            </div>
+
+            <ol>
+                <li>Go to Use Cases → Authentication → Settings</li>
+                <li>Add redirect URI: <code>http://localhost:5000/auth/callback</code></li>
+                <li>Click Save</li>
+            </ol>
+
+            <h3>3. Get Credentials</h3>
+            <ol>
+                <li>Settings → Basic</li>
+                <li>Copy App ID</li>
+                <li>Click "Show" → Copy App Secret</li>
+            </ol>
+
+            <!-- Connect -->
+            <h2 id="connect">Connect Instagram</h2>
+
+            <ol>
+                <li>Open the <a href="/onboarding">onboarding wizard</a></li>
+                <li>Enter your App ID and App Secret</li>
+                <li>Click "Connect with Facebook"</li>
+                <li>Authorize permissions</li>
+                <li>Done!</li>
+            </ol>
+
+            <div class="alert alert-info">
+                <strong>Note</strong>
+                Your Instagram must be a Business Account connected to a Facebook Page.
+            </div>
+
+            <!-- Auto Posting -->
+            <h2 id="posting">Auto Posting</h2>
+
+            <p>Instalaz can automatically post:</p>
+
+            <ul>
+                <li><strong>Carousels</strong> - 2-10 images per post</li>
+                <li><strong>Reels</strong> - Short videos</li>
+                <li><strong>Stories</strong> - Temporary content</li>
+            </ul>
+
+            <h3>Add Content</h3>
+            <ol>
+                <li>Dashboard → Edit account</li>
+                <li>Set image/video URLs</li>
+                <li>Add caption URL (one caption per line)</li>
+                <li>Save</li>
+            </ol>
+
+            <!-- Scheduling -->
+            <h2 id="scheduling">Scheduling</h2>
+
+            <p>Set posting times in the Schedule page:</p>
+
+            <pre><code>{
+  "morning": {"hour": 9, "minute": 0},
+  "afternoon": {"hour": 15, "minute": 30},
+  "evening": {"hour": 19, "minute": 0}
+}</code></pre>
+
+            <!-- Multiple Accounts -->
+            <h2 id="accounts">Multiple Accounts</h2>
+
+            <p>Manage unlimited Instagram accounts:</p>
+
+            <ol>
+                <li>Click "Add Account"</li>
+                <li>Enter account details</li>
+                <li>Connect via Facebook OAuth</li>
+                <li>Set unique schedule per account</li>
+            </ol>
+
+            <!-- Common Errors -->
+            <h2 id="errors">Common Errors</h2>
+
+            <h3>"Insecure connection detected"</h3>
+            <p><strong>Fix:</strong> Add <code>http://localhost:5000/auth/callback</code> to OAuth Redirect URIs in your
+                Facebook App.</p>
+
+            <h3>"No Instagram accounts found"</h3>
+            <p><strong>Fix:</strong> Convert Instagram to Business Account and connect to a Facebook Page.</p>
+
+            <h3>"Token expired"</h3>
+            <p><strong>Fix:</strong> Tokens last 60 days. Click "Reconnect" to get a new token.</p>
+
+            <!-- Token Management -->
+            <h2 id="tokens">Token Management</h2>
+
+            <p>Instalaz automatically:</p>
+
+            <ul>
+                <li>Exchanges short-lived tokens (2 hours) for long-lived tokens (60 days)</li>
+                <li>Tracks expiration dates</li>
+                <li>Notifies you when tokens need renewal</li>
+            </ul>
+
+            <div class="alert alert-info">
+                <strong>Best Practice</strong>
+                Reconnect your account every 50 days to avoid expiration.
+            </div>
+
+            <div style="margin: 60px 0; text-align: center;">
+                <a href="/onboarding" class="btn">Start Setup →</a>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

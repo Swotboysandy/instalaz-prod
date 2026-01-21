@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="glass-card mx-auto" style="max-width: 800px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h4 class="m-0 d-flex align-items-center">
+            <ion-icon name="time-outline" class="me-2"></ion-icon>
+            Global Schedule Settings
+        </h4>
+        <a class="btn btn-secondary" href="{{ url_for('index') }}">
+            <ion-icon name="arrow-back-outline" class="me-1"></ion-icon> Back
+        </a>
+    </div>
+
+    <div class="alert alert-info d-flex align-items-center">
+        <ion-icon name="information-circle-outline" class="me-2" style="font-size: 1.2rem;"></ion-icon>
+        <div>
+            These times apply to accounts that do <strong>not</strong> have specific schedules enabled.
+            Times are in <strong>IST (Indian Standard Time)</strong>.
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="mb-4">
+            <h5 class="mb-3 d-flex align-items-center"><ion-icon name="sunny-outline"
+                    class="me-2 text-warning"></ion-icon>Morning Post</h5>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Hour (0-23)</label>
+                    <input type="number" class="form-control" name="morning_h" value="{{ schedule.morning.hour }}"
+                        min="0" max="23">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Minute (0-59)</label>
+                    <input type="number" class="form-control" name="morning_m" value="{{ schedule.morning.minute }}"
+                        min="0" max="59">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="mb-3 d-flex align-items-center"><ion-icon name="partly-sunny-outline"
+                    class="me-2 text-info"></ion-icon>Afternoon Post</h5>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Hour (0-23)</label>
+                    <input type="number" class="form-control" name="afternoon_h" value="{{ schedule.afternoon.hour }}"
+                        min="0" max="23">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Minute (0-59)</label>
+                    <input type="number" class="form-control" name="afternoon_m" value="{{ schedule.afternoon.minute }}"
+                        min="0" max="59">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="mb-3 d-flex align-items-center"><ion-icon name="moon-outline"
+                    class="me-2 text-primary"></ion-icon>Evening Post</h5>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Hour (0-23)</label>
+                    <input type="number" class="form-control" name="evening_h" value="{{ schedule.evening.hour }}"
+                        min="0" max="23">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Minute (0-59)</label>
+                    <input type="number" class="form-control" name="evening_m" value="{{ schedule.evening.minute }}"
+                        min="0" max="59">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="mb-3 d-flex align-items-center"><ion-icon name="star-outline"
+                    class="me-2 text-secondary"></ion-icon>Night Post</h5>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Hour (0-23)</label>
+                    <input type="number" class="form-control" name="night_h" value="{{ schedule.night.hour }}" min="0"
+                        max="23">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Minute (0-59)</label>
+                    <input type="number" class="form-control" name="night_m" value="{{ schedule.night.minute }}" min="0"
+                        max="59">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" role="switch" id="enabledSwitch" name="enabled" {% if
+                schedule.enabled %}checked{% endif %}>
+            <label class="form-check-label fw-bold" for="enabledSwitch">Enable Global Scheduler</label>
+            <div class="form-text">
+                <ion-icon name="checkmark-circle-outline" class="me-1"></ion-icon>
+                If enabled, the system will check for pending posts at these times.
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-success px-4">
+                <ion-icon name="save-outline" class="me-1"></ion-icon> Save Schedule
+            </button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

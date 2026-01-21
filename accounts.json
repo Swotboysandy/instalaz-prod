@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Fashion Lifestyle (Demo)",
+    "type": "carousel",
+    "access_token_env": "DEMO_FASHION_TOKEN",
+    "ig_user_id_env": "DEMO_FASHION_IG_ID",
+    "caption_url": "file://demo_data/captions.txt",
+    "state_prefix": "demo_fashion",
+    "base_url": "file://demo_data/images",
+    "slides_per_post": 3,
+    "schedule_enabled": "on",
+    "is_demo": true
+  },
+  {
+    "name": "Tech Reviews (Demo)",
+    "type": "reel",
+    "access_token_env": "DEMO_TECH_TOKEN",
+    "ig_user_id_env": "DEMO_TECH_IG_ID",
+    "video_base_url": "file://demo_data/videos",
+    "caption_url": "file://demo_data/captions.txt",
+    "state_prefix": "demo_tech",
+    "schedule_enabled": "on",
+    "is_demo": true
+  },
+  {
+    "name": "Travel Adventures (Demo)",
+    "type": "carousel",
+    "access_token_env": "DEMO_TRAVEL_TOKEN",
+    "ig_user_id_env": "DEMO_TRAVEL_IG_ID",
+    "caption_url": "file://demo_data/captions.txt",
+    "state_prefix": "demo_travel",
+    "base_url": "file://demo_data/images",
+    "slides_per_post": 5,
+    "max_images": 50,
+    "is_demo": true
+  }
+]

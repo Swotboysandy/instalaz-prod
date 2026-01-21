@@ -1,0 +1,1278 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Instalaz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+
+  <!-- Font & Main Style -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+  <!-- Sortable -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+
+  <style>
+    :root {
+      --bg1: #090040;
+      --bg2: #1a0b3b;
+      --glass: rgba(255, 255, 255, 0.08);
+      --stroke: rgba(255, 255, 255, 0.15);
+      --text: #e7e7ee;
+      --muted: #a9adc2;
+      --gradA: #B13BFF;
+      --gradB: #471396;
+      --gradC: #34d399;
+      --accent: #FFCC00;
+      --danger: #ff6b6b;
+      --success: #22c55e;
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(124, 92, 255, 0.15), transparent 60%),
+        radial-gradient(1200px 800px at 110% 10%, rgba(34, 211, 238, 0.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x: hidden;
+    }
+
+    .app-nav {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      border-bottom: 1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+    }
+
+    .dashboard {
+      min-height: calc(100vh - 72px);
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      padding: clamp(16px, 5vw, 56px);
+      align-content: start;
+    }
+
+    .account {
+      position: relative;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+      border-radius: 22px;
+      padding: 22px 22px 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+    }
+
+    .account:hover {
+      transform: translateY(-6px) rotateX(2deg) rotateY(1deg);
+      box-shadow: 0 25px 60px rgba(124, 92, 255, 0.25);
+      border-color: rgba(124, 92, 255, 0.35);
+    }
+
+    .account::before {
+      content: "";
+      position: absolute;
+      inset: auto -30% -45% -30%;
+      height: 55%;
+      background: radial-gradient(closest-side, rgba(124, 92, 255, 0.35), rgba(34, 211, 238, 0.25), transparent 70%);
+      filter: blur(45px);
+      z-index: 0;
+      transform: translateZ(-1px);
+    }
+
+    .account-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .badge-type {
+      font-size: .75rem;
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: .35rem .6rem;
+      border-radius: 999px;
+    }
+
+    .edit-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: .35rem .5rem;
+    }
+
+    .edit-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .account-name {
+      font-weight: 700;
+      letter-spacing: .2px;
+      margin: 0 0 6px;
+    }
+
+    .status-line {
+      font-size: .9rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.0);
+      transition: background .25s ease, box-shadow .25s ease;
+    }
+
+    .dot.running {
+      background: var(--accent);
+      animation: dotPulse 1.5s infinite;
+    }
+
+    .dot.success {
+      background: var(--success);
+    }
+
+    .dot.error {
+      background: var(--danger);
+    }
+
+    @keyframes dotPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.6);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 209, 102, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 209, 102, 0);
+      }
+    }
+
+    .circle-wrap {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin: 16px 0 14px;
+    }
+
+    .circle-btn {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: radial-gradient(120% 120% at 10% 110%, rgba(52, 211, 153, 0.25), transparent 60%),
+        linear-gradient(135deg, rgba(124, 92, 255, 0.25), rgba(34, 211, 238, 0.25));
+      box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.04), 0 10px 30px rgba(0, 0, 0, 0.35);
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+      overflow: hidden;
+    }
+
+    .circle-btn:hover {
+      transform: scale(1.05);
+      box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.06), 0 16px 38px rgba(124, 92, 255, 0.35);
+      filter: saturate(1.2);
+    }
+
+    .circle-btn.loading::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.25);
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: .6rem;
+      justify-content: center;
+    }
+
+    .btn-ghost {
+      --alpha: .14;
+      border: 1px solid var(--stroke);
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(255, 255, 255, var(--alpha)), rgba(255, 255, 255, calc(var(--alpha) - .06)));
+      backdrop-filter: blur(6px);
+      border-radius: 12px;
+      padding: .45rem .8rem;
+    }
+
+    .btn-ghost:hover {
+      backdrop-filter: blur(5px);
+    }
+
+    /* Dark Modal */
+    .modal-content {
+      background: #1a0b3b;
+      background: var(--bg2);
+      color: var(--text);
+      border: 1px solid var(--stroke);
+    }
+
+    .modal-header,
+    .modal-footer {
+      border-color: var(--stroke);
+    }
+
+    .btn-close-white {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    .form-control,
+    .form-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--stroke);
+      color: var(--text);
+    }
+
+    .form-control:focus {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border-color: var(--gradA);
+      box-shadow: 0 0 0 4px rgba(177, 59, 255, 0.15);
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--stroke);
+    }
+
+    .card-body {
+      color: var(--text);
+    }
+
+    /* Floating Button Container */
+    .floating-container {
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+      text-align: center;
+      padding: 1rem 0;
+      background: linear-gradient(to top, rgba(26, 11, 59, 1) 20%, rgba(26, 11, 59, 0) 100%);
+      pointer-events: none;
+      margin-top: -20px;
+      /* Pull up slightly */
+    }
+
+    .floating-btn {
+      pointer-events: auto;
+      border-radius: 50px;
+      padding: 10px 24px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(135deg, var(--gradA), var(--gradB));
+      color: white;
+      border: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .floating-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(124, 92, 255, 0.4);
+      color: white;
+    }
+
+    /* Busy Overlay */
+    .busy-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 0, 64, 0.85);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .busy-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .step-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      margin: 0 4px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    .step-chip.run {
+      background: rgba(177, 59, 255, 0.2);
+      color: #fff;
+      border: 1px solid rgba(177, 59, 255, 0.4);
+    }
+
+    .step-chip.done {
+      background: rgba(34, 197, 94, 0.2);
+      color: #fff;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Selected Bar */
+    .selected-bar {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .selected-bar .head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .sel-wrap {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .sel-chip {
+      position: relative;
+      flex: 0 0 60px;
+      height: 60px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--stroke);
+    }
+
+    .sel-chip img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sel-remove {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sel-remove:hover {
+      background: #ff4d4d;
+    }
+
+    /* Skeleton */
+    .skeleton {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      width: 100%;
+      height: 140px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
+    }
+
+    /* Badges */
+    .badge-used {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      border: 1px solid var(--stroke);
+    }
+
+    .badge-new {
+      background: rgba(52, 211, 153, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    /* Pagination Styles */
+    .page-link {
+      background-color: transparent;
+      border-color: var(--stroke);
+      color: var(--muted);
+    }
+
+    .page-link:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--stroke);
+      color: #fff;
+    }
+
+    .page-item.active .page-link {
+      background-color: var(--gradA);
+      border-color: var(--gradA);
+      color: #fff;
+    }
+
+    .page-item.disabled .page-link {
+      background-color: transparent;
+      border-color: var(--stroke);
+      color: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar navbar-expand-lg app-nav">
+    <div class="container py-2">
+      <div class="d-flex align-items-center gap-3">
+        <a href="/dashboard" class="text-decoration-none">
+          <h3 class="m-0 text-white">Instalaz</h3>
+        </a>
+      </div>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <!-- Notification Status Indicator -->
+        <button id="notifyBtn" class="btn btn-sm rounded-3 d-flex align-items-center gap-1"
+          style="background: rgba(255,255,255,0.05); border: 1px solid var(--stroke); color: var(--muted);"
+          title="Telegram Notifications">
+          <ion-icon name="logo-telegram"></ion-icon>
+          <span id="notifyStatus" class="small">Loading...</span>
+        </button>
+        <a class="btn btn-sm btn-outline-info rounded-3" href="{{ url_for('onboarding') }}" title="Setup Guide">
+          <ion-icon name="rocket-outline" class="me-1"></ion-icon>Setup Guide
+        </a>
+        <a class="btn btn-sm btn-outline-warning rounded-3" href="{{ url_for('schedule_settings') }}"
+          title="Schedule Times">
+          <ion-icon name="time-outline" class="me-1"></ion-icon>Schedule
+        </a>
+        <a class="btn btn-sm btn-outline-light rounded-3" href="{{ url_for('account_form') }}">
+          <ion-icon name="add-outline" class="me-1"></ion-icon>Add Account
+        </a>
+        <a class="btn btn-sm btn-outline-light rounded-3" href="{{ url_for('setup_guide') }}" title="Documentation">
+          <ion-icon name="book-outline" class="me-1"></ion-icon>Docs
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- DASHBOARD GRID -->
+  <main class="dashboard container-fluid">
+    {% for acct in accounts %}
+    <section class="account" data-idx="{{ loop.index0 }}" data-type="{{ acct.type }}">
+      <div class="account-head">
+        <span class="badge-type text-uppercase">{{ acct.type }}</span>
+        <button class="edit-btn" title="Edit" onclick="location.href='{{ url_for('account_form', idx=loop.index0) }}'">
+          <ion-icon name="options-outline"></ion-icon>
+        </button>
+      </div>
+      <h5 class="account-name">{{ acct.name }}</h5>
+      <div class="status-line">
+        <span class="dot" id="dot-{{ loop.index0 }}"></span>
+        <span id="status-{{ loop.index0 }}">idle</span>
+      </div>
+      <div class="circle-wrap">
+        <button class="circle-btn" title="Auto post (no manual selection)">
+          <ion-icon name="play" style="font-size: 2rem; padding-left: 4px;"></ion-icon>
+        </button>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost preview-btn">
+          <ion-icon name="eye-outline" class="me-1"></ion-icon>Preview & Select
+        </button>
+      </div>
+    </section>
+    {% endfor %}
+  </main>
+
+  <!-- PREVIEW MODAL -->
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content position-relative">
+        <!-- Busy overlay -->
+        <div class="busy-overlay" id="publishOverlay">
+          <div class="text-center">
+            <div class="spinner-border mb-3" role="status" aria-hidden="true"></div>
+            <div class="h6" id="publishStatusText">Publishing… please wait</div>
+            <div class="steps mt-2" id="stepChips">
+              <span class="step-chip run"><span class="chip-dot"></span>Create</span>
+              <span class="step-chip"><span class="chip-dot"></span>Process</span>
+              <span class="step-chip"><span class="chip-dot"></span>Publish</span>
+              <span class="step-chip"><span class="chip-dot"></span>Permalink</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h5 class="modal-title d-flex align-items-center gap-2"><ion-icon name="eye-outline"></ion-icon> Preview &
+            Select</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="previewAlert" class="alert d-none"></div>
+          <div class="mb-3">
+            <label class="form-label">Caption (edit before publish)</label>
+            <textarea id="previewCaption" class="form-control" rows="3" placeholder="Your caption..."></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">First Comment (optional)</label>
+            <textarea id="previewComment" class="form-control" rows="2"
+              placeholder="Add a comment...">Follow for more daily content! ��🔥</textarea>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="hideLikes" checked>
+            <label class="form-check-label" for="hideLikes">Hide like counts on post</label>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="toggleUsed">
+              <label class="form-check-label" for="toggleUsed">Include used items</label>
+            </div>
+            <div class="small text-secondary">Tip: “Used” items are those you’ve already posted (tracked in your JSON
+              state).</div>
+          </div>
+          <!-- Selected bar -->
+          <div id="selectedBar" class="selected-bar d-none">
+            <div class="head">
+              <div class="fw-semibold">Selected (<span id="selectedCount">0</span>)</div>
+              <div id="selectedWarn"></div>
+            </div>
+            <div id="selectedWrap" class="sel-wrap"></div>
+          </div>
+          <!-- Image Section -->
+          <div id="imageSection" class="d-none">
+            <!-- Pagination Images - At Top -->
+            <nav aria-label="Image pagination" class="mb-3 sticky-top bg-dark pt-2 pb-2" style="top: 0; z-index: 10;">
+              <ul class="pagination justify-content-center flex-wrap mb-0" id="paginationImg"></ul>
+            </nav>
+            <div class="row g-3" id="imageGrid"></div>
+          </div>
+          <!-- Video Section -->
+          <div id="videoSection" class="d-none">
+            <!-- Pagination Videos - At Top -->
+            <nav aria-label="Video pagination" class="mb-3 sticky-top bg-dark pt-2 pb-2" style="top: 0; z-index: 10;">
+              <ul class="pagination justify-content-center flex-wrap mb-0" id="paginationVid"></ul>
+            </nav>
+            <div class="row g-3" id="videoGrid"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="publishBtn" class="btn btn-primary" disabled>
+            <span class="me-2 d-flex align-items-center"><ion-icon name="rocket-outline"></ion-icon></span>Publish
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="actionToast" class="toast text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body">
+        <div class="d-flex">
+          <div class="me-2 text-success" style="font-size: 1.2rem;"><ion-icon id="toastIcon"
+              name="checkmark-circle-outline"></ion-icon></div>
+          <div>
+            <div id="toastMsg">Done !</div>
+            <div id="toastLink" class="small text-secondary"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Utilities
+    const qs = (s, el = document) => el.querySelector(s);
+    const qsa = (s, el = document) => Array.from(el.querySelectorAll(s));
+
+    // Toast helper
+    function showToast(message, iconName = 'checkmark-circle-outline', linkText = '', linkHref = '') {
+      const icon = qs('#toastIcon');
+      icon.setAttribute('name', iconName);
+      if (iconName === 'alert-circle-outline') {
+        icon.parentElement.className = 'me-2 text-danger';
+      } else {
+        icon.parentElement.className = 'me-2 text-success';
+      }
+      qs('#toastMsg').textContent = message;
+      const link = qs('#toastLink');
+
+      if (linkText && linkHref) {
+        link.innerHTML = `<a href="${linkHref}" target="_blank" class="text-decoration-none">${linkText}</a>`;
+      } else {
+        link.textContent = '';
+      }
+
+      const t = new bootstrap.Toast(qs('#actionToast'), { delay: 3500 });
+      t.show();
+    }
+
+    // Ripple on circle buttons
+    function addRipple(e) {
+      const btn = e.currentTarget;
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.width = r.style.height = size + 'px';
+      r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      r.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 650);
+    }
+
+    // Instagram carousel limits
+    const MIN_SLIDES = 2;
+    const MAX_SLIDES = 10;
+
+    // Global state variables
+    let currentIdx = -1;
+    let currentType = '';
+    let currentPage = 1;
+    let selectedItems = new Map(); // Stores { url: { url: '...' } }
+    let includeUsed = false;
+    const pageSizeImages = 10;
+    const pageSizeVideos = 10;
+
+    const previewModal = qs('#previewModal');
+    const publishOverlay = qs('#publishOverlay');
+    const publishBtn = qs('#publishBtn');
+
+    function markStep(stepIndex) {
+      const steps = qsa('.step-chip');
+      steps.forEach((chip, i) => {
+        if (i < stepIndex) {
+          chip.classList.add('done');
+          chip.classList.remove('run');
+        } else if (i === stepIndex) {
+          chip.classList.add('run');
+          chip.classList.remove('done');
+        } else {
+          chip.classList.remove('run', 'done');
+        }
+      });
+    }
+
+    function resetPreviewUI() {
+      qs('#previewCaption').value = '';
+      qs('#previewComment').value = 'Follow for more daily content! 🚀🔥';
+      qs('#hideLikes').checked = true;
+      qs('#toggleUsed').checked = false;
+      includeUsed = false;
+      selectedItems.clear();
+      qs('#previewAlert').classList.add('d-none');
+      qs('#imageSection').classList.add('d-none');
+      qs('#videoSection').classList.add('d-none');
+
+      // Reset pagination controls
+      qs('#paginationImg').innerHTML = '';
+      qs('#paginationVid').innerHTML = '';
+
+      if (publishBtn) {
+        publishBtn.disabled = true;
+        publishBtn.innerHTML = '<span class="me-2 d-flex align-items-center"><ion-icon name="rocket-outline"></ion-icon></span>Publish';
+      }
+      publishOverlay.classList.remove('active');
+      markStep(0);
+
+      qs('#selectedBar').classList.add('d-none');
+      qs('#selectedWrap').innerHTML = '';
+      qs('#selectedCount').textContent = '0';
+      qs('#selectedWarn').textContent = '';
+    }
+
+    function renderSelectedBar() {
+      const selectedBar = qs('#selectedBar');
+      const head = qs('#selectedWrap');
+      if (!head) return;
+      head.innerHTML = '';
+
+      qs('#selectedCount').textContent = selectedItems.size;
+      qs('#selectedWarn').textContent = '';
+
+      if (currentType === 'carousel' && selectedItems.size > 0) {
+        selectedItems.forEach((item, url) => {
+          head.insertAdjacentHTML('beforeend', `
+            <div class="sel-chip" data-url="${url}">
+              <img src="${url}" alt="Selected item" class="sel-thumb">
+              <button type="button" class="sel-remove"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+          `);
+        });
+        selectedBar.classList.remove('d-none');
+      } else {
+        selectedBar.classList.add('d-none');
+      }
+
+      const warn = qs('#selectedWarn');
+      let msg = '';
+      if (selectedItems.size < MIN_SLIDES) msg = `Select at least ${MIN_SLIDES}.`;
+      else if (selectedItems.size > MAX_SLIDES) msg = `Max ${MAX_SLIDES} slides.`;
+      warn.textContent = msg;
+    }
+
+    function updatePublishState() {
+      if (!publishBtn) return;
+      if (currentType === 'carousel') {
+        publishBtn.disabled = selectedItems.size < MIN_SLIDES || selectedItems.size > MAX_SLIDES;
+      } else { // video
+        publishBtn.disabled = selectedItems.size === 0;
+      }
+    }
+
+    function showAlert(message, type) {
+      const alertDiv = qs('#previewAlert');
+      alertDiv.textContent = message;
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.classList.remove('d-none');
+    }
+
+    function renderSkeletons(container, count = 8) {
+      container.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        container.insertAdjacentHTML('beforeend', `<div class="col-6 col-md-4 col-lg-3"><div class="skeleton"></div></div>`);
+      }
+    }
+
+    async function fetchPage(page = 1) {
+      const cap = await fetch(`/preview/${currentIdx}?page=${page}&include_used=${includeUsed ? 1 : 0}` +
+        (currentType === 'carousel' ? `&page_size=${pageSizeImages}` : `&page_size=${pageSizeVideos}`));
+      const data = await cap.json();
+
+      qs('#previewCaption').value = data.caption || '';
+
+      if (data.type === 'carousel') {
+        const box = qs('#imageGrid');
+        box.innerHTML = '';
+
+        (data.images || []).forEach((obj, i) => {
+          const { url, filename, used } = obj;
+          const isSelected = selectedItems.has(url);
+          box.insertAdjacentHTML('beforeend', `
+        <div class="col-6 col-md-4 col-lg-3" data-url="${url}">
+          <div class="card h-100 shadow-sm">
+            <img src="${url}" class="card-img-top" alt="${filename}">
+            <div class="card-body p-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                  <input class="form-check-input include-check" type="checkbox" ${isSelected ? 'checked' : ''}>
+                  <label class="form-check-label">Include</label>
+                </div>
+                <span class="badge rounded-pill ${used ? 'badge-used' : 'badge-new'}">${used ? 'Used' : 'New'}</span>
+              </div>
+              <small class="text-secondary d-block mt-1" style="word-break: break-all">${filename}</small>
+            </div>
+          </div>
+        </div>`);
+        });
+
+        if (window.Sortable) new Sortable(box, {
+          animation: 150,
+          onEnd: () => {
+            // Re-ordering logic if needed
+          }
+        });
+
+        qs('#imageSection').classList.remove('d-none');
+        qs('#videoSection').classList.add('d-none');
+
+        renderPagination(qs('#paginationImg'), data.total_items || 0, pageSizeImages, page);
+        renderSelectedBar();
+        updatePublishState();
+
+      } else {
+        const grid = qs('#videoGrid');
+        grid.innerHTML = '';
+
+        (data.videos || []).forEach((obj, i) => {
+          const { url, filename, used } = obj;
+          const isSelected = selectedItems.has(url);
+          grid.insertAdjacentHTML('beforeend', `
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            <video src="${url}" class="w-100" controls preload="metadata"></video>
+            <div class="card-body p-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                  <input class="form-check-input pick-video" name="pick" type="radio" value="${url}" ${isSelected ? 'checked' : ''}>
+                  <label class="form-check-label">Use this</label>
+                </div>
+                <span class="badge rounded-pill ${used ? 'badge-used' : 'badge-new'}">${used ? 'Used' : 'New'}</span>
+              </div>
+              <small class="text-secondary d-block mt-1" style="word-break: break-all">${filename}</small>
+            </div>
+          </div>
+        </div>`);
+        });
+
+        qs('#videoSection').classList.remove('d-none');
+        qs('#imageSection').classList.add('d-none');
+
+        renderPagination(qs('#paginationVid'), data.total_items || 0, pageSizeVideos, page);
+        updatePublishState();
+      }
+    }
+
+    function renderPagination(container, totalItems, pageSize, currentPage) {
+      container.innerHTML = '';
+      const totalPages = Math.ceil(totalItems / pageSize);
+      if (totalPages <= 1) return;
+
+      const createItem = (page, text, isActive = false, isDisabled = false) => {
+        const li = document.createElement('li');
+        li.className = `page-item ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`;
+        li.innerHTML = `<button class="page-link shadow-none" ${isDisabled ? 'disabled' : ''}>${text}</button>`;
+        if (!isDisabled && !isActive) {
+          li.querySelector('button').addEventListener('click', () => {
+            handlePageChange(page - currentPage); // Delta
+          });
+        }
+        return li;
+      };
+
+      // Previous
+      container.appendChild(createItem(currentPage - 1, '<ion-icon name="chevron-back-outline"></ion-icon>', false, currentPage === 1));
+
+      // Page Numbers with more visible pages
+      if (totalPages <= 7) {
+        // Show all pages if 7 or fewer
+        for (let i = 1; i <= totalPages; i++) {
+          container.appendChild(createItem(i, i, i === currentPage));
+        }
+      } else {
+        // Always show first page
+        container.appendChild(createItem(1, 1, currentPage === 1));
+
+        // Calculate range around current page
+        let startPage = Math.max(2, currentPage - 2);
+        let endPage = Math.min(totalPages - 1, currentPage + 2);
+
+        // Adjust range if at the beginning
+        if (currentPage <= 3) {
+          endPage = 5;
+        }
+
+        // Adjust range if at the end
+        if (currentPage >= totalPages - 2) {
+          startPage = totalPages - 4;
+        }
+
+        // Add ellipsis after first page if needed
+        if (startPage > 2) {
+          container.appendChild(createItem(currentPage, '...', false, true));
+        }
+
+        // Add pages in range
+        for (let i = startPage; i <= endPage; i++) {
+          container.appendChild(createItem(i, i, i === currentPage));
+        }
+
+        // Add ellipsis before last page if needed
+        if (endPage < totalPages - 1) {
+          container.appendChild(createItem(currentPage, '...', false, true));
+        }
+
+        // Always show last page
+        container.appendChild(createItem(totalPages, totalPages, currentPage === totalPages));
+      }
+
+      // Next
+      container.appendChild(createItem(currentPage + 1, '<ion-icon name="chevron-forward-outline"></ion-icon>', false, currentPage === totalPages));
+    }
+
+    // Open modal
+    qsa(".account .preview-btn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const acc = e.currentTarget.closest(".account");
+        currentIdx = acc.dataset.idx;
+        currentType = acc.dataset.type;
+        currentPage = 1;
+        resetPreviewUI();
+
+        if (currentType === 'carousel') {
+          qs('#imageSection').classList.remove('d-none');
+          renderSkeletons(qs('#imageGrid'), pageSizeImages);
+        } else {
+          qs('#videoSection').classList.remove('d-none');
+          renderSkeletons(qs('#videoGrid'), pageSizeVideos);
+        }
+
+        new bootstrap.Modal(previewModal).show();
+        await fetchPage(1);
+        renderSelectedBar();
+        updatePublishState();
+      });
+    });
+
+    // Include used toggle
+    qs('#toggleUsed').addEventListener('change', async (e) => {
+      includeUsed = e.currentTarget.checked;
+      currentPage = 1;
+      if (currentType === 'carousel') renderSkeletons(qs('#imageGrid'), pageSizeImages);
+      else renderSkeletons(qs('#videoGrid'), pageSizeVideos);
+      await fetchPage(1);
+    });
+
+    // Handle Selection Changes (Delegation)
+    document.addEventListener('change', (e) => {
+      if (e.target.classList.contains('include-check')) {
+        const card = e.target.closest('[data-url]');
+        const url = card.dataset.url;
+        if (e.target.checked) {
+          selectedItems.set(url, { url });
+        } else {
+          selectedItems.delete(url);
+        }
+        updatePublishState();
+        renderSelectedBar();
+      }
+
+      if (e.target.classList.contains('pick-video')) {
+        selectedItems.clear(); // Clear previous video selection
+        if (e.target.checked) {
+          selectedItems.set(e.target.value, { url: e.target.value });
+        }
+        updatePublishState();
+      }
+    });
+
+    // Remove from Selected bar
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sel-remove');
+      if (!btn) return;
+      const chip = btn.closest('.sel-chip');
+      const url = chip?.dataset.url;
+      if (!url) return;
+
+      selectedItems.delete(url);
+
+      // If the item is currently visible on screen, uncheck it
+      const card = qsa('#imageGrid > [data-url]').find(c => c.getAttribute('data-url') === url);
+      if (card) {
+        const cb = qs('.include-check', card);
+        if (cb) cb.checked = false;
+      }
+
+      updatePublishState();
+      renderSelectedBar();
+    });
+
+    // Pagination Handlers
+    function handlePageChange(delta) {
+      const newPage = currentPage + delta;
+      if (newPage < 1) return;
+      currentPage = newPage;
+      if (currentType === 'carousel') {
+        renderSkeletons(qs('#imageGrid'), pageSizeImages);
+      } else {
+        renderSkeletons(qs('#videoGrid'), pageSizeVideos);
+      }
+      fetchPage(currentPage);
+    }
+
+
+    // Publish flow
+    if (publishBtn) {
+      publishBtn.addEventListener('click', async () => {
+        const caption = (qs('#previewCaption').value || '').trim();
+        const first_comment = (qs('#previewComment').value || '').trim();
+        const hide_likes = qs('#hideLikes').checked;
+        let body;
+
+        if (currentType === 'carousel') {
+          const selected = Array.from(selectedItems.keys());
+
+          if (selected.length < MIN_SLIDES) return showAlert(`Please select at least ${MIN_SLIDES} slide(s).`, 'warning');
+          if (selected.length > MAX_SLIDES) return showAlert(`You can select up to ${MAX_SLIDES} slides.`, 'warning');
+
+          body = { images: selected, caption, first_comment, hide_likes };
+        } else {
+          // For video, we expect 1
+          const selected = Array.from(selectedItems.keys());
+          if (selected.length === 0) return showAlert('Please choose a video.', 'warning');
+          body = { video: selected[0], caption, first_comment, hide_likes };
+        }
+
+        publishBtn.disabled = true;
+        const prevHTML = publishBtn.innerHTML;
+        publishBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Publishing…`;
+        publishOverlay.classList.add('active');
+        markStep(0);
+
+        try {
+          markStep(0); // Create
+          setTimeout(() => markStep(1), 600); // Process
+          setTimeout(() => markStep(2), 1200); // Publish
+
+
+
+          const res = await fetch(`/publish/${currentIdx}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+
+          const data = await res.json();
+
+          if (res.status === 202 || res.ok) {
+            // Started in background. Poll for status!
+            markStep(1); // Process
+
+            const pollInt = setInterval(async () => {
+              try {
+                const sRes = await fetch('/status');
+                const sList = await sRes.json();
+                const s = sList[currentIdx];
+
+                // Update live status text
+                const statusTxt = qs('#publishStatusText');
+                if (statusTxt && s.message && s.status === 'running') {
+                  statusTxt.textContent = s.message;
+                }
+
+                if (s.status === 'success') {
+                  clearInterval(pollInt);
+                  markStep(3); // Permalink
+                  if (statusTxt) statusTxt.textContent = "Done!";
+
+                  const msg = s.message || '';
+                  const match = msg.match(/Permalink:\s*(https?:\/\/\S+)/i);
+                  const permalink = match ? match[1] : '';
+
+                  showToast('Published successfully!', 'checkmark-circle-outline', permalink ? 'View Post' : '', permalink);
+
+                  setTimeout(() => {
+                    bootstrap.Modal.getInstance(previewModal).hide();
+                    resetPreviewUI();
+                    publishBtn.disabled = false;
+                    publishBtn.innerHTML = prevHTML;
+                    publishOverlay.classList.remove('active');
+                    // Reset text
+                    if (statusTxt) statusTxt.textContent = "Publishing… please wait";
+                  }, 1200);
+
+                } else if (s.status === 'error') {
+                  clearInterval(pollInt);
+                  throw new Error(s.message || 'Unknown error');
+                } else {
+                  // Still running
+                  markStep(2); // Publish
+                }
+              } catch (e) {
+                clearInterval(pollInt);
+                showAlert('Polling failed: ' + e.message, 'danger');
+                publishBtn.disabled = false;
+                publishBtn.innerHTML = prevHTML;
+                publishOverlay.classList.remove('active');
+                if (qs('#publishStatusText')) qs('#publishStatusText').textContent = "Publishing… please wait";
+              }
+            }, 1000);
+
+          } else {
+            throw new Error(data.error || 'Unknown error');
+          }
+
+        } catch (err) {
+          showAlert('Publish failed: ' + err.message, 'danger');
+          showToast('Publish failed', 'alert-circle-outline');
+          publishBtn.disabled = false;
+          publishBtn.innerHTML = prevHTML;
+          publishOverlay.classList.remove('active');
+        }
+      });
+    }
+
+    // Attach behavior per account card (Dashboard status polling)
+    qsa(".account").forEach(el => {
+      const idx = el.dataset.idx;
+      const btn = qs(".circle-btn", el);
+      const statusE = qs(`#status-${idx}`);
+      const dot = qs(`#dot-${idx}`);
+
+      btn.addEventListener('click', addRipple);
+
+      function setStatus(stateText, state) {
+        statusE.textContent = stateText;
+        dot.classList.remove('running', 'success', 'error');
+        if (state) dot.classList.add(state);
+      }
+
+      function poll() {
+        fetch("/status").then(r => r.json()).then(list => {
+          const s = list[idx];
+          if (s.status === "running") {
+            setTimeout(poll, 900);
+          } else {
+            btn.classList.remove("loading");
+            if (s.status === "success") {
+              setStatus('completed', 'success');
+              const msg = s.message || '';
+              const match = msg.match(/Permalink:\s*(https?:\/\/\S+)/i);
+              const permalink = match ? match[1] : '';
+              showToast('Published successfully!', 'checkmark-circle-outline', permalink ? 'Open on Instagram' : '', permalink);
+            } else if (s.status === "error") {
+              setStatus('error', 'error');
+              showToast('Publish failed', 'alert-circle-outline');
+            } else {
+              setStatus(s.status || 'done');
+            }
+          }
+        }).catch(() => {
+          btn.classList.remove("loading");
+          setStatus('error', 'error');
+          showToast('Status check failed', 'alert-circle-outline');
+        });
+      }
+
+      btn.addEventListener("click", () => {
+        btn.classList.add("loading");
+        setStatus('running…', 'running');
+        fetch(`/run/${idx}`, { method: "POST" }).then(r => {
+          if (!r.ok) throw new Error("Start failed");
+          setTimeout(poll, 700);
+        }).catch(err => {
+          btn.classList.remove("loading");
+          setStatus('error', 'error');
+          showToast('Start failed', 'alert-circle-outline');
+          console.error(err);
+        });
+      });
+    });
+
+    // ─────────────────────────────────────────────────────
+    // Notification Status Check
+    // ─────────────────────────────────────────────────────
+    const notifyBtn = qs('#notifyBtn');
+    const notifyStatus = qs('#notifyStatus');
+
+    async function checkNotificationStatus() {
+      try {
+        const res = await fetch('/notifications/status');
+        const data = await res.json();
+
+        if (data.enabled) {
+          notifyBtn.style.borderColor = 'var(--success)';
+          notifyBtn.style.color = 'var(--success)';
+          notifyStatus.textContent = 'Connected';
+          notifyBtn.title = 'Telegram notifications are active. Click to test.';
+        } else {
+          notifyBtn.style.borderColor = 'var(--muted)';
+          notifyBtn.style.color = 'var(--muted)';
+          notifyStatus.textContent = 'Not configured';
+          notifyBtn.title = 'Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID to enable';
+        }
+      } catch (e) {
+        notifyStatus.textContent = 'Error';
+        console.error('Notification check failed:', e);
+      }
+    }
+
+    notifyBtn.addEventListener('click', async () => {
+      if (notifyStatus.textContent === 'Connected') {
+        notifyBtn.disabled = true;
+        notifyStatus.textContent = 'Sending...';
+        try {
+          const res = await fetch('/notifications/test', { method: 'POST' });
+          const data = await res.json();
+          if (data.success) {
+            showToast('Test notification sent!', 'checkmark-circle-outline');
+          } else {
+            showToast('Notification failed', 'alert-circle-outline');
+          }
+        } catch (e) {
+          showToast('Test failed', 'alert-circle-outline');
+        } finally {
+          notifyBtn.disabled = false;
+          await checkNotificationStatus();
+        }
+      } else {
+        showToast('Configure Telegram first (see .env.example)', 'information-circle-outline');
+      }
+    });
+
+    // Check on page load
+    checkNotificationStatus();
+  </script>
+  <!-- ClickSpark Effect -->
+  <script src="{{ url_for('static', filename='js/click-spark.js') }}"></script>
+  <click-spark spark-color="#fff" spark-size="10" spark-radius="15" spark-count="8" duration="400"></click-spark>
+</body>
+
+</html>

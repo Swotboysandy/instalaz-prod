@@ -1,0 +1,260 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="glass-card mx-auto" style="max-width: 1100px;">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="brand-badge d-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+        <ion-icon name="settings-outline"></ion-icon>
+      </div>
+      <h4 class="m-0">Account Settings</h4>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('index') }}">
+      <ion-icon name="arrow-back-outline" class="me-1"></ion-icon> Back
+    </a>
+  </div>
+
+  <form method="post" class="row g-4">
+    <!-- BASIC -->
+    <div class="col-md-6">
+      <label class="form-label">Name</label>
+      <input class="form-control" name="name" value="{{ account.name or '' }}" required
+        placeholder="e.g., Pracandy Carousel A">
+      <div class="form-text">Visible label in the dashboard.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Type</label>
+      <select class="form-select" name="type" id="typeSel" required>
+        <option value="carousel" {% if account.type=='carousel' %}selected{% endif %}>Carousel</option>
+        <option value="reel" {% if account.type=='reel' %}selected{% endif %}>Reel</option>
+      </select>
+      <div class="form-text">Choose what this account will post.</div>
+    </div>
+
+    <!-- AUTH -->
+    <div class="col-md-6">
+      <label class="form-label">Access Token ENV</label>
+      <input class="form-control" name="access_token_env" value="{{ account.access_token_env or '' }}" required
+        placeholder="ENV var name, e.g., PRACANDY_A_TOKEN">
+      <div class="form-text">Name of the environment variable that stores the long-lived IG token.</div>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">IG User ID ENV</label>
+      <input class="form-control" name="ig_user_id_env" value="{{ account.ig_user_id_env or '' }}" required
+        placeholder="ENV var name, e.g., PRACANDY_A_IG_ID">
+      <div class="form-text">Name of the environment variable that stores the Instagram user ID.</div>
+    </div>
+
+    <!-- CAROUSEL ONLY -->
+    <div class="col-md-7 carousel-only">
+      <label class="form-label">Base Image URL</label>
+      <input class="form-control" name="base_url" value="{{ account.base_url or '' }}"
+        placeholder="https://example.com/images">
+      <div class="form-text">We’ll fetch images like <code>img (1).jpg</code>, <code>img (2).jpg</code>… from this base
+        URL.</div>
+    </div>
+    <div class="col-md-5 carousel-only">
+      <label class="form-label">Slides per Post</label>
+      <input type="number" min="1" class="form-control" name="slides_per_post"
+        value="{{ account.slides_per_post or 3 }}">
+      <div class="form-text">How many slides to publish by default (you can override in Preview).</div>
+    </div>
+
+    <!-- REEL ONLY -->
+    <div class="col-md-7 reel-only">
+      <label class="form-label">Video Base URL</label>
+      <input class="form-control" name="video_base_url" value="{{ account.video_base_url or '' }}"
+        placeholder="https://example.com/videos">
+      <div class="form-text">We’ll pick videos like <code>vid.mp4</code>, <code>vid (1).mp4</code>… from this base URL.
+      </div>
+    </div>
+
+    <!-- SHARED -->
+    <div class="col-md-7">
+      <label class="form-label">Caption URL</label>
+      <input class="form-control" name="caption_url" value="{{ account.caption_url or '' }}" required
+        placeholder="https://example.com/captions.txt">
+      <div class="form-text">Public plaintext file: one caption per line.</div>
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">State Prefix</label>
+      <input class="form-control" name="state_prefix" value="{{ account.state_prefix or '' }}" required
+        placeholder="e.g., pracandy_a">
+      <div class="form-text">Used for local state files like <code>{{'{'}}prefix{{'}'}}_image.json</code>.</div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div class="col-12">
+      <label class="form-label">Schedule Times (IST)</label>
+
+      <!-- Hidden Input to store real value -->
+      <input type="hidden" name="schedule_times" id="scheduleTimesInput" value="{{ account.schedule_times or '' }}">
+
+      <!-- Interactive Chip Container -->
+      <div class="time-chips-container mb-2" id="timeChipsContainer">
+        <!-- Chips injected by JS -->
+        <button type="button" class="add-time-btn" onclick="openTimePicker()">
+          <ion-icon name="add-outline" class="me-1"></ion-icon> Add Time
+        </button>
+      </div>
+
+      <!-- Custom Time Builder Widget -->
+      <div class="time-builder-widget d-none" id="timeBuilderWidget">
+
+        <!-- Quick Selects -->
+        <div class="quick-selects mb-3">
+          <span class="text-xs text-muted text-uppercase fw-bold mb-2 d-block" style="font-size: 0.75rem;">Quick
+            Add</span>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn-quick" onclick="addTimeDirect('09:00')">09:00</button>
+            <button type="button" class="btn-quick" onclick="addTimeDirect('12:00')">12:00</button>
+            <button type="button" class="btn-quick" onclick="addTimeDirect('15:00')">15:00</button>
+            <button type="button" class="btn-quick" onclick="addTimeDirect('18:00')">18:00</button>
+            <button type="button" class="btn-quick" onclick="addTimeDirect('21:00')">21:00</button>
+          </div>
+        </div>
+
+        <!-- Custom Selects -->
+        <span class="text-xs text-muted text-uppercase fw-bold mb-2 d-block" style="font-size: 0.75rem;">Custom
+          Time</span>
+        <div class="custom-select-row d-flex align-items-center gap-2">
+          <div class="custom-select-wrapper">
+            <select id="selHour" class="form-select time-select">
+              {% for i in range(0, 24) %}
+              <option value="{{ '%02d' % i }}">{{ '%02d' % i }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <span class="text-muted fw-bold">:</span>
+          <div class="custom-select-wrapper">
+            <select id="selMinute" class="form-select time-select">
+              {% for i in range(0, 60, 5) %}
+              <option value="{{ '%02d' % i }}">{{ '%02d' % i }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="button" class="btn btn-sm btn-success ms-2 px-3" onclick="addTimeFromBuilder()">
+            Add
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary px-3" onclick="closeTimePicker()">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <div class="form-text">Times (IST). Leaves empty to use Global Schedule.</div>
+    </div>
+
+    <div class="col-12">
+      <div class="form-check form-switch p-0 d-flex gap-2 align-items-center">
+        <input class="form-check-input ms-0" type="checkbox" role="switch" id="scheduleSwitch" name="schedule_enabled"
+          {% if account.schedule_enabled=='on' %}checked{% endif %}>
+        <div>
+          <label class="form-check-label fw-bold" for="scheduleSwitch">Enable Auto-Schedule</label>
+          <div class="form-text mt-0">
+            If enabled, this account will post at the times specified above (or Global defaults).
+            <br>
+            <small class="text-info">Mode: Random Selection (No repeats until all content used).</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button class="btn btn-success">
+        <ion-icon name="save-outline" class="me-1"></ion-icon> Save Account
+      </button>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Toggle fields based on Type
+  function toggleType() {
+    const val = document.getElementById('typeSel').value;
+    document.querySelectorAll('.carousel-only').forEach(el => el.style.display = (val === 'carousel' ? '' : 'none'));
+    document.querySelectorAll('.reel-only').forEach(el => el.style.display = (val === 'reel' ? '' : 'none'));
+  }
+  document.getElementById('typeSel').addEventListener('change', toggleType);
+  toggleType();
+
+  // ─── TIME PICKER LOGIC ───
+  const chipsContainer = document.getElementById('timeChipsContainer');
+  const hiddenInput = document.getElementById('scheduleTimesInput');
+  const widget = document.getElementById('timeBuilderWidget');
+  const addBtn = chipsContainer.querySelector('.add-time-btn');
+
+  let currentTimes = [];
+
+  function parseTimes() {
+    const val = hiddenInput.value;
+    if (!val) return [];
+    return val.split(',').map(t => t.trim()).filter(Boolean);
+  }
+
+  function renderChips() {
+    // Clear existing chips but keep Add Button
+    Array.from(chipsContainer.children).forEach(c => {
+      if (!c.classList.contains('add-time-btn')) c.remove();
+    });
+
+    currentTimes.forEach(time => {
+      const chip = document.createElement('div');
+      chip.className = 'time-chip';
+      chip.innerHTML = `
+            <ion-icon name="time-outline"></ion-icon> ${time}
+            <span class="remove" onclick="removeTime('${time}')"><ion-icon name="close-outline"></ion-icon></span>
+          `;
+      chipsContainer.insertBefore(chip, addBtn);
+    });
+  }
+
+  function updateHidden() {
+    hiddenInput.value = currentTimes.join(', ');
+  }
+
+  function addTimeDirect(val) {
+    if (val && !currentTimes.includes(val)) {
+      currentTimes.push(val);
+      currentTimes.sort();
+      updateHidden();
+      renderChips();
+    }
+  }
+
+  function addTimeFromBuilder() {
+    const h = document.getElementById('selHour').value;
+    const m = document.getElementById('selMinute').value;
+    const val = `${h}:${m}`;
+    addTimeDirect(val);
+  }
+
+  function removeTime(t) {
+    currentTimes = currentTimes.filter(x => x !== t);
+    updateHidden();
+    renderChips();
+  }
+
+  window.openTimePicker = function () {
+    widget.classList.remove('d-none');
+  };
+
+  window.closeTimePicker = function () {
+    widget.classList.add('d-none');
+  };
+
+  window.addTimeDirect = addTimeDirect;
+  window.addTimeFromBuilder = addTimeFromBuilder;
+  window.removeTime = removeTime;
+
+  // Init
+  currentTimes = parseTimes();
+  renderChips();
+
+</script>
+
+{% endblock %}

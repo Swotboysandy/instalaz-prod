@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "morning": {
+    "hour": 8,
+    "minute": 30
+  },
+  "afternoon": {
+    "hour": 15,
+    "minute": 0
+  },
+  "evening": {
+    "hour": 18,
+    "minute": 30
+  },
+  "night": {
+    "hour": 23,
+    "minute": 0
+  }
+}
